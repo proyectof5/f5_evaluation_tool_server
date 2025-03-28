@@ -1,0 +1,13 @@
+[project]
+name = "f5-evaluation-tool-server"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "cryptography>=44.0.2",
+    "django-cors-headers>=4.7.0",
+    "djangorestframework>=3.15.2",
+    "mysqlclient>=2.2.7",
+    "python-dotenv>=1.1.0",
+]
