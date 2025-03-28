@@ -36,15 +36,9 @@ MANIFEST
 pip-log.txt
 pip-delete-this-directory.txt
 
-
-# uv dependencies
-uv.lock
-pyproject.toml
-
 # Unit test / coverage reports
 htmlcov/
 .tox/
-
 .nox/
 .coverage
 .coverage.*
