@@ -26,7 +26,7 @@ services:
       context: . # Build from the Dockerfile in the current directory
     image: django_project_web # Optional: Specify an image name
     environment:
-      DATABASE_URL: mysql://${DATABASE_USER}:${DATABASE_PASSWORD}@db:3306/${DATABASE_NAME} # Connection string for Django to connect to MySQL
+      DATABASE_URL: "mysql://${DATABASE_USER}:${DATABASE_PASSWORD}@db:3306/${DATABASE_NAME}" # Connection string for Django to connect to MySQL
     ports:
       - "${WEB_PORT}:8000" # Exposing Django on port 8000
     depends_on:
