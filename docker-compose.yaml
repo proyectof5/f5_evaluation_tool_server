@@ -1,0 +1,46 @@
+version: "3.8"
+
+services:
+  # MySQL database service
+  db:
+    image: mysql:8.0 # Using the official MySQL image
+    environment:
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+      DATABASE_NAME: ${DATABASE_NAME}
+      DATABASE_USER: ${DATABASE_USER}
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Django application service
+  web:
+    build:
+      context: . # Build from the Dockerfile in the current directory
+    image: django_project_web # Optional: Specify an image name
+    environment:
+      DATABASE_URL: mysql://${DATABASE_USER}:${DATABASE_PASSWORD}@db:3306/${DATABASE_NAME} # Connection string for Django to connect to MySQL
+    ports:
+      - "${WEB_PORT}:8000" # Exposing Django on port 8000
+    depends_on:
+      db:
+        condition: service_healthy # Ensures web waits for db to be ready
+    networks:
+      - app-network
+    command: >
+      sh -c "python manage.py migrate &&
+             python manage.py runserver 0.0.0.0:8000" # Run migrations and start Django server
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  mysql_data:
