@@ -1,0 +1,60 @@
+name: Dockerized CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+
+    services:
+      db:
+        image: mysql:8.0
+        env:
+          DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
+          DATABASE_NAME: ${{ secrets.DATABASE_NAME }}
+          DATABASE_USER: ${{ secrets.DATABASE_USER }}
+          DATABASE_HOST: ${{ secrets.DATABASE_HOST }}
+          DATABASE_PORT: ${{ secrets.DATABASE_PORT }}
+        ports:
+          - ${{ secrets.DATABASE_PORT }}:3306
+        options: --health-cmd="mysqladmin ping -h ${{ secrets.DATABASE_HOST }}" --health-interval=10s --health-timeout=5s --health-retries=3
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker images
+        run: docker-compose -f docker-compose.yaml build
+
+      - name: Run Migrations
+        env:
+          DATABASE_URL: mysql://${{ secrets.DATABASE_USER }}:${{ secrets.DATABASE_PASSWORD }}@${{ secrets.DATABASE_HOST }}:${{ secrets.DATABASE_PORT }}/${{ secrets.MYSQL_DATABASE }}
+        run: docker-compose -f docker-compose.yaml run --rm web python manage.py migrate
+
+      - name: Run Tests
+        env:
+          DATABASE_URL: mysql://${{ secrets.DATABASE_USER }}:${{ secrets.DATABASE_PASSWORD }}@${{ secrets.DATABASE_HOST }}:${{ secrets.DATABASE_PORT }}/${{ secrets.MYSQL_DATABASE }}
+        run: docker-compose -f docker-compose.yaml run --rm web python manage.py test
+
+  deploy:
+    needs: build-test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Log in to Docker Hub
+        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+
+      - name: Push Docker Image
+        run: |
+          docker-compose -f docker-compose.yaml build
+          docker tag f5_evaluation_tool ${{ secrets.DOCKER_USERNAME }}/f5_evaluation_tool:latest
+          docker push ${{ secrets.DOCKER_USERNAME }}/f5_evaluation_tool:latest
