@@ -20,7 +20,7 @@ jobs:
           DATABASE_PORT: ${{ secrets.DATABASE_PORT }}
         ports:
           - 3307:3306
-          
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -38,12 +38,16 @@ jobs:
 
       - name: Run Migrations
         env:
-          DATABASE_URL: mysql://${{ secrets.DATABASE_USER }}:${{ secrets.DATABASE_PASSWORD }}@${{ secrets.DATABASE_HOST }}:${{ secrets.DATABASE_PORT }}/${{ secrets.MYSQL_DATABASE }}
+          DATABASE_URL: mysql://${{ secrets.DATABASE_USER }}:${{ secrets.DATABASE_PASSWORD }}@${{ secrets.DATABASE_HOST }}:${{ secrets.DATABASE_PORT }}/${{ secrets.DATABASE_NAME }}
+          DATABASE_PORT: 3306
+          WEB_PORT: 8000
         run: docker-compose -f docker-compose.yaml run --rm web python manage.py migrate
 
       - name: Run Tests
         env:
-          DATABASE_URL: mysql://${{ secrets.DATABASE_USER }}:${{ secrets.DATABASE_PASSWORD }}@${{ secrets.DATABASE_HOST }}:${{ secrets.DATABASE_PORT }}/${{ secrets.MYSQL_DATABASE }}
+          DATABASE_URL: mysql://${{ secrets.DATABASE_USER }}:${{ secrets.DATABASE_PASSWORD }}@${{ secrets.DATABASE_HOST }}:${{ secrets.DATABASE_PORT }}/${{ secrets.DATABASE_NAME }}
+          DATABASE_PORT: 3306
+          WEB_PORT: 8000
         run: docker-compose -f docker-compose.yaml run --rm web python manage.py test
 
   deploy:
