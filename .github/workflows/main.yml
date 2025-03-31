@@ -20,8 +20,7 @@ jobs:
           DATABASE_PORT: ${{ secrets.DATABASE_PORT }}
         ports:
           - 3307:3306
-        options: --health-cmd="mysqladmin ping -h ${{ secrets.DATABASE_HOST }}" --health-interval=10s --health-timeout=5s --health-retries=3
-
+          
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
