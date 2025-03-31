@@ -14,10 +14,10 @@ jobs:
         image: mysql:8.0
         env:
           MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
-          DATABASE_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
-          DATABASE_NAME: ${{ secrets.MYSQL_DATABASE }}
-          DATABASE_USER: ${{ secrets.MYSQL_USER  }}
-          DATABASE_HOST: ${{ secrets.MYSQL_HOST }}
+          MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
+          MYSQL_DATABASE: ${{ secrets.MYSQL_DATABASE }}
+          MYSQL_USER: ${{ secrets.MYSQL_USER  }}
+          MYSQL_HOST: ${{ secrets.MYSQL_HOST }}
           DATABASE_PORT: 3307
         ports:
           - 3307:3306
@@ -39,14 +39,14 @@ jobs:
 
       - name: Run Migrations
         env:
-          DATABASE_URL: mysql://${{ secrets.DATABASE_USER }}:${{ secrets.DATABASE_PASSWORD }}@${{ secrets.DATABASE_HOST }}:${{ secrets.DATABASE_PORT }}/${{ secrets.DATABASE_NAME }}
+          DATABASE_URL: mysql://${{ secrets.MYSQL_USER }}:${{ secrets.MYSQL_PASSWORD }}@${{ secrets.MYSQL_HOST }}:3307/${{ secrets.MYSQL_DATABASE }}
           DATABASE_PORT: 3306
           WEB_PORT: 8000
         run: docker-compose -f docker-compose.yaml run --rm web python manage.py migrate
 
       - name: Run Tests
         env:
-          DATABASE_URL: mysql://${{ secrets.DATABASE_USER }}:${{ secrets.DATABASE_PASSWORD }}@${{ secrets.DATABASE_HOST }}:${{ secrets.DATABASE_PORT }}/${{ secrets.DATABASE_NAME }}
+          DATABASE_URL: mysql://${{ secrets.MYSQL_USER }}:${{ secrets.MYSQL_PASSWORD }}@${{ secrets.MYSQL_HOST }}:${{ secrets.DATABASE_PORT }}/${{ secrets.MYSQL_DATABASE }}
           DATABASE_PORT: 3306
           WEB_PORT: 8000
         run: docker-compose -f docker-compose.yaml run --rm web python manage.py test
