@@ -37,7 +37,7 @@ jobs:
           echo "MYSQL_PASSWORD=${{ secrets.MYSQL_PASSWORD }}" >> .env
           echo "DOCKER_USERNAME=${{ secrets.DOCKER_USERNAME }}" >> .env
           echo "MYSQL_PORT=3306" >> .env
-          echo "WEB_PORT=8000" >> .env
+          echo "WEB_PORT=8010" >> .env
 
       - name: Install Docker Compose
         run: |
@@ -50,15 +50,15 @@ jobs:
       - name: Run Migrations
         env:
           DATABASE_URL: mysql://${{ secrets.MYSQL_USER }}:${{ secrets.MYSQL_PASSWORD }}@${{ secrets.MYSQL_HOST }}:3307/${{ secrets.MYSQL_DATABASE }}
-          DATABASE_PORT: 3306
-          WEB_PORT: 8000
+          DATABASE_PORT: 3307
+          WEB_PORT: 8010
         run: docker-compose -f docker-compose.yaml run --rm web python manage.py migrate
 
       - name: Run Tests
         env:
           DATABASE_URL: mysql://${{ secrets.MYSQL_USER }}:${{ secrets.MYSQL_PASSWORD }}@${{ secrets.MYSQL_HOST }}:${{ secrets.DATABASE_PORT }}/${{ secrets.MYSQL_DATABASE }}
-          DATABASE_PORT: 3306
-          WEB_PORT: 8000
+          DATABASE_PORT: 3307
+          WEB_PORT: 8010
         run: docker-compose -f docker-compose.yaml run --rm web python manage.py test
 
   deploy:
