@@ -13,11 +13,12 @@ jobs:
       db:
         image: mysql:8.0
         env:
-          DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
-          DATABASE_NAME: ${{ secrets.DATABASE_NAME }}
-          DATABASE_USER: ${{ secrets.DATABASE_USER }}
-          DATABASE_HOST: ${{ secrets.DATABASE_HOST }}
-          DATABASE_PORT: ${{ secrets.DATABASE_PORT }}
+          MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
+          DATABASE_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
+          DATABASE_NAME: ${{ secrets.MYSQL_DATABASE }}
+          DATABASE_USER: ${{ secrets.MYSQL_USER  }}
+          DATABASE_HOST: ${{ secrets.MYSQL_HOST }}
+          DATABASE_PORT: 3307
         ports:
           - 3307:3306
 
@@ -63,5 +64,6 @@ jobs:
 
       - name: Push Docker Image
         run: |
-          docker tag ${{ secrets.DOCKER_USERNAME }}/f5_evaluation_tool_server:latest
+          docker tag f5_evaluation_tool_server:latest ${{ secrets.DOCKER_USERNAME }}/f5_evaluation_tool_server:latest
           docker push ${{ secrets.DOCKER_USERNAME }}/f5_evaluation_tool_server:latest
+
