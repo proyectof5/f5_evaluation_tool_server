@@ -9,7 +9,7 @@ services:
       DATABASE_NAME: ${DATABASE_NAME}
       DATABASE_USER: ${DATABASE_USER}
     ports:
-      - "3307:3306"
+      - "${DATABASE_PORT}:3306"
     volumes:
       - mysql_data:/var/lib/mysql
     networks:
@@ -24,9 +24,9 @@ services:
   web:
     build:
       context: . # Build from the Dockerfile in the current directory
-    image: django_project_web # Optional: Specify an image name
+    image: ${DOCKER_USERNAME}/f5_evaluation_tool:latest
     environment:
-      DATABASE_URL: "mysql://${DATABASE_USER}:${DATABASE_PASSWORD}@db:3306/${DATABASE_NAME}" # Connection string for Django to connect to MySQL
+      DATABASE_URL: "mysql://${DATABASE_USER}:${DATABASE_PASSWORD}@db:${DATABASE_PORT}/${DATABASE_NAME}" # Connection string for Django to connect to MySQL
     ports:
       - "${WEB_PORT}:8000" # Exposing Django on port 8000
     depends_on:
@@ -35,7 +35,8 @@ services:
     networks:
       - app-network
     command: >
-      sh -c "python manage.py migrate &&
+      sh -c "
+             python manage.py migrate &&
              python manage.py runserver 0.0.0.0:8000" # Run migrations and start Django server
 
 networks:

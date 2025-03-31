@@ -55,6 +55,5 @@ jobs:
 
       - name: Push Docker Image
         run: |
-          docker-compose -f docker-compose.yaml build
-          docker tag f5_evaluation_tool ${{ secrets.DOCKER_USERNAME }}/f5_evaluation_tool:latest
-          docker push ${{ secrets.DOCKER_USERNAME }}/f5_evaluation_tool:latest
+          docker tag ${{ secrets.DOCKER_USERNAME }}/web:latest
+          docker push ${{ secrets.DOCKER_USERNAME }}/web:latest
