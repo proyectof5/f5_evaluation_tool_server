@@ -19,7 +19,7 @@ jobs:
           DATABASE_HOST: ${{ secrets.DATABASE_HOST }}
           DATABASE_PORT: ${{ secrets.DATABASE_PORT }}
         ports:
-          - ${{ secrets.DATABASE_PORT }}:3306
+          - 3307:3306
         options: --health-cmd="mysqladmin ping -h ${{ secrets.DATABASE_HOST }}" --health-interval=10s --health-timeout=5s --health-retries=3
 
     steps:
@@ -55,5 +55,5 @@ jobs:
 
       - name: Push Docker Image
         run: |
-          docker tag ${{ secrets.DOCKER_USERNAME }}/web:latest
-          docker push ${{ secrets.DOCKER_USERNAME }}/web:latest
+          docker tag ${{ secrets.DOCKER_USERNAME }}/f5_evaluation_tool_server:latest
+          docker push ${{ secrets.DOCKER_USERNAME }}/f5_evaluation_tool_server:latest
