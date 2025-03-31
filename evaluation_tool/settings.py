@@ -28,6 +28,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = [
     "f5-evaluation-tool-server.onrender.com",
+    "f5-evaluation-tool-server-latest.onrender.com",
     "52.41.36.82",
     "54.191.253.12",
     "44.226.122.3"
