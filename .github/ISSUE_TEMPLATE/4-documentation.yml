@@ -44,7 +44,7 @@ body:
         - "⬇️ Low"
         - "⚖️ Medium"
         - "🔥 High"
-      default: "⚖️ Medium"
+      default: 1
 
   - type: checkboxes
     id: additional_context
