@@ -1,5 +1,6 @@
 name: "📖 Documentation Issue"
 description: "📝 Report an issue or suggest improvements for the documentation."
+title: "[Docs]: "
 labels: ["📚 documentation"]
 body:
   - type: markdown
