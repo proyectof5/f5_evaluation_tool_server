@@ -18,9 +18,9 @@ jobs:
           MYSQL_DATABASE: ${{ secrets.MYSQL_DATABASE }}
           MYSQL_USER: ${{ secrets.MYSQL_USER  }}
           MYSQL_HOST: ${{ secrets.MYSQL_HOST }}
-          DATABASE_PORT: 3308  # Changed port here
+          DATABASE_PORT: 3307
         ports:
-          - 3308:3306  # Changed port here
+          - 3307:3306
 
     steps:
       - name: Checkout repository
