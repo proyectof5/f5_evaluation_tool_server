@@ -20,6 +20,7 @@ urlpatterns = [
     path('v1/', include([
         path('competences/', include('competence_app.urls')),
         path('technologies/', include('technology_app.urls')),
+        path('categories/', include('category_app.urls')),
     ])),
 ]
 
