@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'rest_framework',
     'competence_app',
+    'technology_app',
 ]
 
 MIDDLEWARE = [
