@@ -21,6 +21,7 @@ urlpatterns = [
         path('competences/', include('competence_app.urls')),
         path('technologies/', include('technology_app.urls')),
         path('categories/', include('category_app.urls')),
+        path('levels/', include('level_app.urls')),
     ])),
 ]
 
