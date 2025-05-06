@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'competence_app',
     'technology_app',
     'category_app',
+    'level_app',
 ]
 
 MIDDLEWARE = [
