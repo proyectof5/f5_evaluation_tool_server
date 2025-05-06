@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'competence_app',
     'technology_app',
+    'category_app',
 ]
 
 MIDDLEWARE = [
