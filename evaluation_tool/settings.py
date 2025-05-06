@@ -31,19 +31,19 @@ ALLOWED_HOSTS = [
     "f5-evaluation-tool-server-latest.onrender.com",
     "52.41.36.82",
     "54.191.253.12",
-    "44.226.122.3"
+    "44.226.122.3",
+    "127.0.0.1",
     ]
 
 
 # Application definition
 
 INSTALLED_APPS = [
-    'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
+    'rest_framework',
+    'competence_app',
 ]
 
 MIDDLEWARE = [
@@ -57,6 +57,8 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'evaluation_tool.urls'
+
+AUTHENTICATION_BACKENDS = []
 
 TEMPLATES = [
     {
