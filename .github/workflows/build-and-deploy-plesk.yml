@@ -1,0 +1,61 @@
+name: Build and Deploy Docker Plesk
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build-and-deploy-plesk:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Build and save Docker image
+        run: |
+          docker buildx create --use
+          docker buildx build --platform linux/amd64 --tag local-evaluation:latest --output type=docker .
+          docker save local-evaluation:latest > evaluation-image.tar
+
+      - name: Setup SSH and Deploy
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SERVER_HOST: ${{ secrets.SERVER_HOST }}
+          DATABASE_NAME: ${{ secrets.DATABASE_NAME }}
+          DATABASE_USER: ${{ secrets.DATABASE_USER }}
+          DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
+          DATABASE_HOST: ${{ secrets.DATABASE_HOST }}
+          DB_PORT: ${{ secrets.DB_PORT }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          
+          echo "Host *
+            StrictHostKeyChecking no
+            UserKnownHostsFile=/dev/null" > ~/.ssh/config
+          
+          chmod +x .github/scripts/deploy.sh
+          
+          if ssh -q root@$SERVER_HOST exit; then
+            echo "SSH connection successful, proceeding with deployment..."
+            # Copy files to server
+            scp evaluation-image.tar root@$SERVER_HOST:/root/
+            scp .github/scripts/deploy.sh root@$SERVER_HOST:/root/
+            
+            # Execute deployment on server
+            ssh root@$SERVER_HOST "DATABASE_NAME=$DATABASE_NAME DATABASE_USER=$DATABASE_USER DATABASE_PASSWORD=$DATABASE_PASSWORD DATABASE_HOST=$DATABASE_HOST DB_PORT=$DB_PORT bash /root/deploy.sh"
+            ssh root@$SERVER_HOST "rm -f /root/deploy.sh"
+          else
+            echo "SSH connection failed"
+            exit 1
+          fi
+
+      - name: Cleanup
+        if: always()
+        run: rm -f evaluation-image.tar
+
+      - name: Clean Docker images
+        run: |
+          echo "🧹 Limpiando imágenes huérfanas de Docker..."
+          docker image prune -f
