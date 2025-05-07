@@ -8,16 +8,21 @@ jobs:
   build-and-deploy-plesk:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
+      - name: 📥 Checkout repository
         uses: actions/checkout@v3
 
-      - name: Build and save Docker image
+      - name: 🛠️ Build and save Docker image
         run: |
           docker buildx create --use
           docker buildx build --platform linux/amd64 --tag local-evaluation:latest --output type=docker .
           docker save local-evaluation:latest > evaluation-image.tar
 
-      - name: Setup SSH and Deploy
+          if [ ! -f evaluation-image.tar ]; then
+            echo "❌ Error: No se creó la imagen TAR." >&2
+            exit 1
+          fi
+
+      - name: 🔐 Setup SSH and Deploy
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
           SERVER_HOST: ${{ secrets.SERVER_HOST }}
@@ -28,34 +33,49 @@ jobs:
           DB_PORT: ${{ secrets.DB_PORT }}
         run: |
           mkdir -p ~/.ssh
-          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+          printf '%s\n' "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          
-          echo "Host *
+
+          echo "Host $SERVER_HOST
+            HostName $SERVER_HOST
+            User root
             StrictHostKeyChecking no
             UserKnownHostsFile=/dev/null" > ~/.ssh/config
-          
+
           chmod +x .github/scripts/deploy.sh
-          
-          if ssh -q root@$SERVER_HOST exit; then
-            echo "SSH connection successful, proceeding with deployment..."
-            # Copy files to server
-            scp evaluation-image.tar root@$SERVER_HOST:/root/
-            scp .github/scripts/deploy.sh root@$SERVER_HOST:/root/
-            
-            # Execute deployment on server
-            ssh root@$SERVER_HOST "DATABASE_NAME=$DATABASE_NAME DATABASE_USER=$DATABASE_USER DATABASE_PASSWORD=$DATABASE_PASSWORD DATABASE_HOST=$DATABASE_HOST DB_PORT=$DB_PORT bash /root/deploy.sh"
-            ssh root@$SERVER_HOST "rm -f /root/deploy.sh"
+
+          echo "🔐 Probando conexión SSH con root@$SERVER_HOST..."
+          if ssh $SERVER_HOST -q exit; then
+            echo "✅ SSH OK: conexión establecida."
+
+            echo "📤 Subiendo archivos al servidor..."
+            scp evaluation-image.tar $SERVER_HOST:/root/ || {
+              echo "❌ Error al subir la imagen TAR" >&2
+              exit 1
+            }
+            scp .github/scripts/deploy.sh $SERVER_HOST:/root/ || {
+              echo "❌ Error al subir el script de despliegue" >&2
+              exit 1
+            }
+
+            echo "🚀 Ejecutando script remoto..."
+            ssh $SERVER_HOST "DATABASE_NAME=$DATABASE_NAME DATABASE_USER=$DATABASE_USER DATABASE_PASSWORD=$DATABASE_PASSWORD DATABASE_HOST=$DATABASE_HOST DB_PORT=$DB_PORT bash /root/deploy.sh" || {
+              echo "❌ Error durante el despliegue remoto" >&2
+              exit 1
+            }
+
+            echo "🧹 Limpiando script remoto..."
+            ssh $SERVER_HOST "rm -f /root/deploy.sh"
           else
-            echo "SSH connection failed"
+            echo "❌ Falló la conexión SSH"
             exit 1
           fi
 
-      - name: Cleanup
+      - name: 🧼 Cleanup local
         if: always()
         run: rm -f evaluation-image.tar
 
-      - name: Clean Docker images
+      - name: 🧹 Clean Docker images
         run: |
           echo "🧹 Limpiando imágenes huérfanas de Docker..."
           docker image prune -f
