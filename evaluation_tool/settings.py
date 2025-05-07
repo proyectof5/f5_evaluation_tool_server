@@ -12,6 +12,10 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 from pathlib import Path
 import os
+from dotenv import load_dotenv
+load_dotenv()
+import pymysql
+pymysql.install_as_MySQLdb()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -29,10 +33,13 @@ DEBUG = True
 ALLOWED_HOSTS = [
     "f5-evaluation-tool-server.onrender.com",
     "f5-evaluation-tool-server-latest.onrender.com",
+    "evaluation.coderf5.es",
     "52.41.36.82",
     "54.191.253.12",
     "44.226.122.3",
     "127.0.0.1",
+    "localhost",
+    "0.0.0.0",
     ]
 
 

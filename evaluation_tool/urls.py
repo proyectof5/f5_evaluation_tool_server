@@ -15,8 +15,13 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.urls import path, include
+from django.http import JsonResponse
+
+def api_root(request):
+    return JsonResponse({"message": "API evaluation 0.0.1"})
 
 urlpatterns = [
+    path('', api_root),
     path('v1/', include([
         path('competences/', include('competence_app.urls')),
         path('technologies/', include('technology_app.urls')),
