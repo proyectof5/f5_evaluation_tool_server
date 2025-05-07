@@ -18,7 +18,7 @@ from django.urls import path, include
 from django.http import JsonResponse
 
 def api_root(request):
-    return JsonResponse({"message": "API evaluation 0.0.9"})
+    return JsonResponse({"message": "API evaluation 0.0.10"})
 
 urlpatterns = [
     path('', api_root),
